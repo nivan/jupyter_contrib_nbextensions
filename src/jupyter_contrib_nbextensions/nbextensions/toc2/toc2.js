@@ -1,11 +1,13 @@
-(requirejs.specified('base/js/namespace') ? define : function(deps, callback) {
+(requirejs.specified('base/js/namespace') ? define : function (deps, callback) {
     "use strict";
     // if here, the Jupyter namespace hasn't been specified to be loaded.
     // This means that we're probably embedded in a page, so we need to make
     // our definition with a specific module name
     return define('nbextensions/toc2/toc2', deps, callback);
-})(['jquery', 'require'], function($, requirejs) {
+})(['jquery', 'require', 'nbextensions/toc2/d3'], function ($, requirejs, d3) {
     "use strict";
+
+    console.log('&&&&&&&&&&&&&&&&', d3);
 
     var IPython;
     var events;
@@ -79,7 +81,7 @@
     // globally-used status variables:
     var rendering_toc_cell = false;
     // toc_position default also serves as the defaults for a non-live notebook
-    var toc_position = {height: 'calc(100% - 180px)', width: '20%', left: '10px', top: '150px'};
+    var toc_position = { height: 'calc(100% - 180px)', width: '20%', left: '10px', top: '150px' };
 
     try {
         // this will work in a live notebook because nbextensions & custom.js
@@ -92,14 +94,14 @@
         console.log('[toc2] working in non-live notebook'); //, err);
         // in non-live notebook, there's no event structure, so we make our own
         if (window.events === undefined) {
-            var Events = function() {};
+            var Events = function () { };
             window.events = $([new Events()]);
         }
         events = window.events;
     }
     var Jupyter = IPython;
 
-    var setMd = function(key, value) {
+    var setMd = function (key, value) {
         if (liveNotebook) {
             var md = IPython.notebook.metadata.toc;
             if (md === undefined) {
@@ -125,7 +127,7 @@
     function removeMathJaxPreview(elt) {
         elt.children('.anchor-link, .toc-mod-link').remove();
         elt.find("script[type='math/tex']").each(
-            function(i, e) {
+            function (i, e) {
                 $(e).replaceWith('$' + $(e).text() + '$')
             })
         elt.find("span.MathJax_Preview").remove()
@@ -133,21 +135,21 @@
         return elt
     }
 
-    var callback_toc_link_click = function(evt) {
+    var callback_toc_link_click = function (evt) {
         // workaround for https://github.com/jupyter/notebook/issues/699
-        setTimeout(function() {
+        setTimeout(function () {
             $.ajax()
         }, 100);
         evt.preventDefault();
         // Each time a link is clicked in the toc, save the current position and target in the history
         var currentSection = $('#toc  .highlight_on_scroll a').data('tocModifiedId')
-        if (window.history.state != null){
+        if (window.history.state != null) {
             if (window.history.state.back != currentSection) {
-                window.history.pushState({'back':currentSection},"",'')
+                window.history.pushState({ 'back': currentSection }, "", '')
             }
         }
         var trg_id = $(evt.currentTarget).attr('data-toc-modified-id');
-        window.history.pushState({'back':trg_id},"",'');
+        window.history.pushState({ 'back': trg_id }, "", '');
         window.history.lastjump = trg_id;
 
         // use native scrollIntoView method with semi-unique id
@@ -165,8 +167,8 @@
     };
 
     //  
-    window.addEventListener('popstate', 
-        function(e) { 
+    window.addEventListener('popstate',
+        function (e) {
             if (e.state != null && e.state.back != null) {
                 var back_id = e.state.back;
                 document.getElementById(back_id).scrollIntoView(true)
@@ -178,9 +180,9 @@
                     });
                 }
             }
-    });
+        });
 
-    var make_link = function(h, toc_mod_id) {
+    var make_link = function (h, toc_mod_id) {
         var a = $('<a>')
             .attr({
                 'href': h.find('.anchor-link').attr('href'),
@@ -203,7 +205,7 @@
             c.prevAll().find('.toc-mod-link').eq(-1).attr('id');
         var highlighted_item = $();
         if (trg_id !== undefined) {
-            highlighted_item = $('.toc a').filter(function(idx, elt) {
+            highlighted_item = $('.toc a').filter(function (idx, elt) {
                 return $(elt).attr('data-toc-modified-id') === trg_id;
             });
         }
@@ -217,7 +219,7 @@
         }
     }
 
-    var create_navigate_menu = function(cfg, callback) {
+    var create_navigate_menu = function (cfg, callback) {
         $('#kernel_menu').parent().after('<li id="Navigate"/>')
         $('#Navigate').addClass('dropdown').append($('<a/>').attr('href', '#').attr('id', 'Navigate_sub'))
         $('#Navigate_sub').text('Navigate').addClass('dropdown-toggle').attr('data-toggle', 'dropdown')
@@ -231,7 +233,7 @@
         } else {
             cfg.nav_menu = {};
             events.on("before_save.Notebook",
-                function() {
+                function () {
                     try {
                         cfg.nav_menu['width'] = $('#Navigate_menu').css('width')
                         cfg.nav_menu['height'] = $('#Navigate_menu').css('height')
@@ -242,11 +244,11 @@
         }
 
         $('#Navigate_menu').resizable({
-            resize: function(event, ui) {
+            resize: function (event, ui) {
                 $('#navigate_menu').css('width', $('#Navigate_menu').css('width'))
                 $('#navigate_menu').css('height', $('#Navigate_menu').height())
             },
-            stop: function(event, ui) {
+            stop: function (event, ui) {
                 cfg.nav_menu['width'] = $('#Navigate_menu').css('width')
                 cfg.nav_menu['height'] = $('#Navigate_menu').css('height')
             }
@@ -263,7 +265,7 @@
         var visible_sidebar = cfg.sideBar && sidebar.is(':visible');
         var sidebar_w = visible_sidebar ? sidebar.outerWidth() : 0;
         var available_space = nb_wrap_w - 2 * margin - sidebar_w;
-        var inner_css = {marginLeft: '', width: ''};
+        var inner_css = { marginLeft: '', width: '' };
         if (cfg.widenNotebook) {
             inner_css.width = available_space;
         }
@@ -287,10 +289,10 @@
     var makeUnmakeMinimized = function (cfg, animate) {
         var open = cfg.sideBar || cfg.toc_section_display;
         var new_css, wrap = $('#toc-wrapper');
-        var anim_opts = {duration: animate ? 'fast' : 0};
+        var anim_opts = { duration: animate ? 'fast' : 0 };
         if (open) {
             $('#toc').show();
-            new_css = cfg.sideBar ? {} : {height: toc_position.height, width: toc_position.width};
+            new_css = cfg.sideBar ? {} : { height: toc_position.height, width: toc_position.width };
         }
         else {
             new_css = {
@@ -317,15 +319,15 @@
         wrap.children('.ui-resizable-e').toggleClass('ui-icon ui-icon-grip-dotted-vertical', make_sidebar);
         if (make_sidebar) {
             var sidebar_top = liveNotebook ? document.getElementById('site').top : 0
-            wrap.css({top: sidebar_top,height: "",left: 0});
+            wrap.css({ top: sidebar_top, height: "", left: 0 });
         }
         else {
-            wrap.css({height: toc_position.height});
+            wrap.css({ height: toc_position.height });
         }
         setNotebookWidth(cfg);
     };
 
-    var create_toc_div = function(cfg, st) {
+    var create_toc_div = function (cfg, st) {
 
         var callbackPageResize = function (evt) {
             setNotebookWidth(cfg);
@@ -335,26 +337,26 @@
             .css('display', 'none')
             .append(
                 $('<div id="toc-header"/>')
-                .append('<span class="header"/>')
-                .append(
-                    $('<i class="fa fa-fw hide-btn" title="Hide ToC">')
-                    .on('click', function (evt) {
-                        cfg.toc_section_display = setMd('toc_section_display', !cfg.toc_section_display);
-                        makeUnmakeMinimized(cfg, true);
-                    })
-                ).append(
-                    $('<i class="fa fa-fw fa-refresh" title="Reload ToC">')
-                    .on('click', function(evt) {
-                        var icon = $(evt.currentTarget).addClass('fa-spin');
-                        table_of_contents(cfg, st);
-                        icon.removeClass('fa-spin');
-                    })
-                ).append(
-                    $('<i class="fa fa-fw fa-cog" title="ToC settings"/>')
-                    .on('click', function(evt) {
-                        show_settings_dialog(cfg, st);
-                    })
-                )
+                    .append('<span class="header"/>')
+                    .append(
+                        $('<i class="fa fa-fw hide-btn" title="Hide ToC">')
+                            .on('click', function (evt) {
+                                cfg.toc_section_display = setMd('toc_section_display', !cfg.toc_section_display);
+                                makeUnmakeMinimized(cfg, true);
+                            })
+                    ).append(
+                        $('<i class="fa fa-fw fa-refresh" title="Reload ToC">')
+                            .on('click', function (evt) {
+                                var icon = $(evt.currentTarget).addClass('fa-spin');
+                                table_of_contents(cfg, st);
+                                icon.removeClass('fa-spin');
+                            })
+                    ).append(
+                        $('<i class="fa fa-fw fa-cog" title="ToC settings"/>')
+                            .on('click', function (evt) {
+                                show_settings_dialog(cfg, st);
+                            })
+                    )
             ).append(
                 $("<div/>").attr("id", "toc").addClass('toc')
             )
@@ -362,7 +364,7 @@
 
         // enable dragging and save position on stop moving
         toc_wrapper.draggable({
-            drag: function(event, ui) {
+            drag: function (event, ui) {
                 var make_sidebar = ui.position.left < 20; // 20 is snapTolerance
                 if (make_sidebar) {
                     ui.position.top = liveNotebook ? document.getElementById('site').top : 0
@@ -383,14 +385,14 @@
 
         toc_wrapper.resizable({
             handles: 'all',
-            resize: function(event, ui) {
+            resize: function (event, ui) {
                 if (cfg.sideBar) {
                     // unset the height set by jquery resizable
                     $('#toc-wrapper').css('height', '');
                     setNotebookWidth(cfg, st)
                 }
             },
-            start: function(event, ui) {
+            start: function (event, ui) {
                 if (!cfg.sideBar) {
                     cfg.toc_section_display = setMd('toc_section_display', true);
                     makeUnmakeMinimized(cfg);
@@ -413,7 +415,7 @@
             cfg.toc_window_display = true;
         }
         // restore toc position at load
-        toc_wrapper.css(cfg.sideBar ? {width: toc_position.width} : toc_position);
+        toc_wrapper.css(cfg.sideBar ? { width: toc_position.width } : toc_position);
         // older toc2 versions stored string representations, so update those
         if (cfg.toc_window_display === 'none') {
             cfg.toc_window_display = setMd('toc_window_display', false);
@@ -436,20 +438,20 @@
     function highlightTocItemOnScroll(cfg, st) {
         if (cfg.markTocItemOnScroll) {
             var scrolling_elt = liveNotebook ? '#site' : window
-            $(scrolling_elt).scroll(function() {
+            $(scrolling_elt).scroll(function () {
                 var headerVisibleHeight = $('#header').is(':visible') ? $('#header').height() : 0
                 var headerHeight = liveNotebook ? headerVisibleHeight : 0
                 var bottom_of_screen = $(window).scrollTop() + $(scrolling_elt).height() + headerHeight;
                 var top_of_screen = $(window).scrollTop() + headerHeight;
                 //loop over all headers
-                all_headers.each(function(i, h) {
+                all_headers.each(function (i, h) {
                     var top_of_element = $(h).offset().top;
 
                     if ((bottom_of_screen > top_of_element) && (top_of_screen < top_of_element)) {
                         // The element is visible
                         var trg_id = $(h).attr('data-toc-modified-id')
                         if (trg_id !== undefined) {
-                            var highlighted_item = $('#toc a').filter(function(idx, elt) {
+                            var highlighted_item = $('#toc a').filter(function (idx, elt) {
                                 return $(elt).attr('data-toc-modified-id') === trg_id;
                             });
                             $('#toc .highlight_on_scroll').removeClass('highlight_on_scroll')
@@ -483,7 +485,7 @@
                 $('.cell > .toc').parent(':has(.tocSkip)')
                     .html(new_html)
                     .find('.toc-item li a')
-                        .on('click', callback_toc_link_click);
+                    .on('click', callback_toc_link_click);
             }
             return;
         }
@@ -520,8 +522,8 @@
         }
     } //end function process_cell_toc --------------------------
 
-    var collapse_by_id = function(trg_id, show, trigger_event) {
-        var anchors = $('.toc .toc-item > li > span > a').filter(function(idx, elt) {
+    var collapse_by_id = function (trg_id, show, trigger_event) {
+        var anchors = $('.toc .toc-item > li > span > a').filter(function (idx, elt) {
             return $(elt).attr('data-toc-modified-id') === trg_id;
         });
         anchors.siblings('i')
@@ -537,8 +539,8 @@
         }
     };
 
-    var callback_toc2_collapsible_headings = function(evt, data) {
-        var trg_id = data.cell.element.find(':header').filter(function(idx, elt) {
+    var callback_toc2_collapsible_headings = function (evt, data) {
+        var trg_id = data.cell.element.find(':header').filter(function (idx, elt) {
             return Boolean($(elt).attr('data-toc-modified-id'));
         }).attr('data-toc-modified-id');
         var show = evt.type.indexOf('un') >= 0;
@@ -546,7 +548,7 @@
         collapse_by_id(trg_id, show, false);
     };
 
-    var callback_collapser = function(evt) {
+    var callback_collapser = function (evt) {
         var clicked_i = $(evt.currentTarget);
         var trg_id = clicked_i.siblings('a').attr('data-toc-modified-id');
         var show = clicked_i.hasClass('fa-caret-right');
@@ -554,7 +556,7 @@
     };
 
     // Table of Contents =================================================================
-    var table_of_contents = function(cfg, st) {
+    var table_of_contents = function (cfg, st) {
 
         // if this call is a result of toc_cell rendering, do nothing to avoid
         // looping, as we're already in a table_of_contents call
@@ -594,13 +596,13 @@
                 break;
             }
         }
-        lbl_ary[0] = cfg.base_numbering-1 // begin numbering at base_numbering
-        for (var i = min_lvl+1; i <= 6; i++) {
+        lbl_ary[0] = cfg.base_numbering - 1 // begin numbering at base_numbering
+        for (var i = min_lvl + 1; i <= 6; i++) {
             lbl_ary[i - min_lvl] = 0;
         }
 
         //loop over all headers
-        all_headers.each(function(i, h) {
+        all_headers.each(function (i, h) {
             // remove pre-existing number
             $(h).children('.toc-item-num').remove();
 
@@ -647,7 +649,7 @@
 
         // update navigation menu
         if (cfg.navigate_menu) {
-            var pop_nav = function() { //callback for create_nav_menu
+            var pop_nav = function () { //callback for create_nav_menu
                 $('#navigate_menu').empty().append($('#toc > .toc-item').clone());
             }
             if ($('#Navigate_menu').length == 0) {
@@ -673,7 +675,7 @@
             'collapse.CollapsibleHeading uncollapse.CollapsibleHeading', callback_toc2_collapsible_headings);
     };
 
-    var toggle_toc = function(cfg, st) {
+    var toggle_toc = function (cfg, st) {
         // toggle draw (first because of first-click behavior)
         var wrap = $("#toc-wrapper");
         var show = wrap.is(':hidden');
@@ -723,15 +725,15 @@
         $('<div class="modal-header">')
             .append('<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>')
             .append('<h4 class="modal-title">ToC2 settings</h4>')
-            .on('mousedown', function() { $('.modal').draggable({handle: '.modal-header'});})
+            .on('mousedown', function () { $('.modal').draggable({ handle: '.modal-header' }); })
             .appendTo(dialog_content);
         $('<div>')
             .addClass('modal-body')
             .append([
                 $('<div>').text(
                     'These settings apply to this notebook only, and are stored in its metadata. ' +
-                    liveNotebook ? 'The defaults for new notebooks can be edited from the nbextensions configurator.' :
-                    'The settings won\'t persist in non-live notebooks though.'),
+                        liveNotebook ? 'The defaults for new notebooks can be edited from the nbextensions configurator.' :
+                        'The settings won\'t persist in non-live notebooks though.'),
                 build_setting_input('number_sections', 'Automatically number headings', 'checkbox'),
                 build_setting_input('skip_h1_title', 'Leave h1 items out of ToC', 'checkbox'),
                 build_setting_input('base_numbering', 'Begin numbering at'),
@@ -767,7 +769,7 @@
         // Try to use bootstrap modal, but bootstrap's js may not be available
         // (e.g. as in non-live notebook), so we provide a poor-man's version
         try {
-            return modal.modal({backdrop: 'static'});
+            return modal.modal({ backdrop: 'static' });
         }
         catch (err) {
             // show the backdrop
@@ -815,11 +817,11 @@
 // export table_of_contents to global namespace for backwards compatibility
 // Do export synchronously, so that it's defined as soon as this file is loaded
 if (!requirejs.specified('base/js/namespace')) {
-    window.table_of_contents = function(cfg, st) {
+    window.table_of_contents = function (cfg, st) {
         "use strict";
         // use require to ensure the module is correctly loaded before the
         // actual call is made
-        requirejs(['nbextensions/toc2/toc2'], function(toc2) {
+        requirejs(['nbextensions/toc2/toc2'], function (toc2) {
             toc2.table_of_contents(cfg, st);
         });
     };
