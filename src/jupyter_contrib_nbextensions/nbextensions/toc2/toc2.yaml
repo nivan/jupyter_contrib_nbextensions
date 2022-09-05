@@ -27,7 +27,7 @@ Parameters:
 - name: toc2.toc_cell
   description: Add a Table of Contents cell at the top of the notebook
   input_type: checkbox
-  default: false
+  default: true
 
 - name: toc2.title_cell
   description: Default heading used for ToC cell (can also be set per-notebook)
@@ -35,7 +35,7 @@ Parameters:
 
 - name: toc2.title_sidebar
   description: Default title used for ToC sidebar/window (can also be set per-notebook)
-  default: 'Contents'
+  default: 'Widget Hierarchy'
 
 - name: toc2.toc_window_display
   description: Display toc window/sidebar at startup
