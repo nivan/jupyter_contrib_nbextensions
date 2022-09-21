@@ -383,15 +383,60 @@
         borderProgressbar.append('div').attr('id', 'detailsProgressBar').attr('class', "w3-grey w3-center")
             .attr("style", "color: #000;background-color: #d0d0d0;width:0%;").text('0%');
         //    
-        var attentionFields = fieldset.append('div').attr('style', 'margin-top:5px;border-top: 1.5px solid grey;width:300px;display: grid;grid-template-columns: 100px 200px;');
+        var attentionFields = fieldset.append('div').attr('style', 'margin-top:5px;border-top: 1.5px solid grey;width:300px;display: grid;grid-template-columns: 90px 200px 10px;');
         attentionFields.append("label").text('Axes Resize: ');
         attentionFields.append("label").attr('id', 'attAxesLabel');
+        attentionFields.append("i")
+            .attr('class', 'fa fa-fw fa-refresh')
+            .attr('style', 'cursor: pointer;')
+            .on('click', function () {
+                d3.select(this).classed('fa-spin', true);
+                if (window.dagController && window.dagController.removeAttRqs) {
+                    window.dagController.removeAttRqs(window.dagController.selectedWidget, 'RESCALE_NEEDED');
+                }
+                d3.select(this).classed('fa-spin', false);
+            });
+
+
         attentionFields.append("label").text('Stability: ');
         attentionFields.append("label").attr('id', 'attStabilityLabel');
+        attentionFields.append("i")
+            .attr('class', 'fa fa-fw fa-refresh')
+            .attr('style', 'cursor: pointer;')
+            .on('click', function () {
+                d3.select(this).classed('fa-spin', true);
+                if (window.dagController && window.dagController.removeAttRqs) {
+                    window.dagController.removeAttRqs(window.dagController.selectedWidget, 'STABILITY_REACHED');
+                }
+                d3.select(this).classed('fa-spin', false);
+            });
+
         attentionFields.append("label").text('Progress: ');
         attentionFields.append("label").attr('id', 'attProgressLabel');
+        attentionFields.append("i")
+            .attr('class', 'fa fa-fw fa-refresh')
+            .attr('style', 'cursor: pointer;')
+            .on('click', function () {
+                d3.select(this).classed('fa-spin', true);
+                if (window.dagController && window.dagController.removeAttRqs) {
+                    window.dagController.removeAttRqs(window.dagController.selectedWidget, 'PROGRESS_NOTIFICATION');
+                }
+                d3.select(this).classed('fa-spin', false);
+            });
+
         attentionFields.append("label").text('Safeguard: ');
         attentionFields.append("label").attr('id', 'attSafeguardLabel');
+        attentionFields.append("i")
+            .attr('class', 'fa fa-fw fa-refresh')
+            .attr('style', 'cursor: pointer;')
+            .on('click', function () {
+                d3.select(this).classed('fa-spin', true);
+                if (window.dagController && window.dagController.removeAttRqs) {
+                    //console.log('CALLING REMOVE');
+                    window.dagController.removeAttRqs(window.dagController.selectedWidget, 'SAFEGUARD_SATISFIED');
+                }
+                d3.select(this).classed('fa-spin', false);
+            });
     }
 
     function installInterface(container) {
@@ -576,7 +621,7 @@
         //     '<div class="toc">' +
         //     $('#toc').html() +
         //     '</div>';
-        var new_html = '<div><p>MMDMFDF</p><svg "width"=900 "height"=400></svg></div>';
+        var new_html = '<svg "width"=900 "height"=400></svg></div>';
 
         if (!liveNotebook) {
             if (cfg.toc_cell) {
