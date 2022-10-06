@@ -69,12 +69,12 @@ input {
 }
 
 .w3-border {
-  border: 1px solid #ccc !important
+  border: 1px solid #D5D5D5 !important
 }
 
 .w3-grey {
   color: #000 !important;
-  background-color: #9e9e9e !important
+  background-color: #D5D5D5 !important
 }
 
 #navigate_menu a {

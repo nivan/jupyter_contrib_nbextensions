@@ -326,35 +326,42 @@
     };
 
     function installDagCanvas(container) {
+        //
+        window.attentionDetailsMapTypeID = { "RESCALE_NEEDED": "attAxesLabel", "PROGRESS_NOTIFICATION": "attProgressLabel", "STABILITY_REACHED": "attStabilityLabel", "SAFEGUARD_SATISFIED": "attSafeguardLabel" };
+        window.attentionColorScale = d3.scaleOrdinal()
+            .domain(["PROCESSING_ERROR", "RESCALE_NEEDED", "STABILITY_REACHED", "SAFEGUARD_SATISFIED", "MULTIPLE"])
+            .range(['#fb9a99', '#a6cee3', '#ccebc5', '#b2df8a', '#e31a1c']);
+        //
         var field = container.append('fieldset').attr("style", "width:300px");
         field.append('legend').text('Widget Dag ');
         var verticalBar = field.append('div').attr('style', 'margin-inline-start: 1rem;');
         //
         field.append('div')
             .html(`        
-        <div style="bo  rder:1px solid #EEE;width:300px;margin-top: 0;">
+        <div style="border:1px solid #EEE;width:300px;margin-top: 0;">
 <p>Attention Request Types</p>
 <div id="dagLegend" style="width:300px;display: grid;grid-template-columns: 150px 150px;margin-left: 10px;">
   <div class="legendItem">
-    <div class="circleBase" style="border:1px solid #999;background:#fbb4ae;"></div>     
-    <label>Axes</label>    
+    <div class="circleBase" style="border:1px solid #999;background:#fb9a99;"></div>     
+    <label>Error</label>    
   </div>
   <div class="legendItem">
-      <div class="circleBase" style="border:1px solid #999;background:#b3cde3;"></div>     
-      <label>Progress</label>
+      <div class="circleBase" style="border:1px solid #999;background:#a6cee3;"></div>     
+      <label>Axes</label>
     </div>      
-   <div class="legendItem">
-      <div class="circleBase" style="border:1px solid #999;background:#ccebc5;">        
-      </div>     
-      <label>Stability</label>
-    </div>
-    
+
     <div class="legendItem">
-      <div class="circleBase" style="border:1px solid #999;background:#decbe4;">        
+      <div class="circleBase" style="border:1px solid #999;background:#b2df8a;">        
       </div>     
       <label>Safeguard</label>
     </div>    
     
+    <div class="legendItem">
+    <div class="circleBase" style="border:1px solid #999;background:#e31a1c;">        
+    </div>     
+    <label>Multiple</label>
+  </div>
+
  </div>
 </div>`);
         //
@@ -379,7 +386,7 @@
         fields.append("label").text('Widget: ');
         fields.append("label").attr('id', 'detailsNameLabel').text('');
         fields.append("label").text('Progress: ');
-        var borderProgressbar = fields.append("div").attr('style', 'border: 1px solid #ccc');
+        var borderProgressbar = fields.append("div").attr('class', 'w3-border');
         borderProgressbar.append('div').attr('id', 'detailsProgressBar').attr('class', "w3-grey w3-center")
             .attr("style", "color: #000;background-color: #d0d0d0;width:0%;").text('0%');
         //    
