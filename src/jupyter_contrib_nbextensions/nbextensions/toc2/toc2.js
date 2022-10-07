@@ -374,7 +374,7 @@
             .append('svg')
             .attr('id', 'dagCanvas')
             .attr('width', 300)
-            .attr('height', 600);
+            .attr('height', 450);
     }
 
     function installDetailsForm(container) {
